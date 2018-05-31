@@ -1,0 +1,168 @@
+/*
+ * Tarea 1.c
+ *
+ *  Created on: May 28, 2018
+ *      Author: Anah�
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int i=0;
+
+typedef struct{
+	char nombre[15];
+	float calificacion;
+} Profesor;
+
+float averageArray(float y, float x);
+void readArray(Profesor *pa, int n);
+void mergeArrays(Profesor *pa1 , int n1, Profesor *pa2, int n2, Profesor *paF, int nF);
+void sortArray(Profesor *paF, int nF);
+void printArray(Profesor *pa , int n);
+
+
+int main(){
+	setbuf(stdout, NULL);
+	Profesor arr1[20];  //Primer arreglo
+	Profesor arr2[20];  //Segundo arreglo
+	Profesor arrF[40];  //Arreglo final, con elementos fusionados y ordenados
+	Profesor *pa1=arr1;
+	Profesor *pa2=arr2;
+	Profesor *paF=arrF;
+	int n1, n2, nF; //Longitud de los arreglos
+
+	scanf("%d",&n1);
+	readArray(pa1,n1); //leer el primer arreglo
+	scanf("%d",&n2);
+	readArray(pa2,n2); //leer el segundo arreglo
+	nF=n1+n2;
+	mergeArrays(pa1,n1,pa2,n2,paF,nF);  //Fusionar los dos arreglos en un tercer arreglo
+
+	sortArray(paF,nF);  //Ordenar los elementos del tercer arreglo, recuerde que pueden
+	//existir profesores repetidos
+
+	//printArray(paF,nF); //Imprimir el resultado final
+
+	return 0;
+}
+void readArray(Profesor *pa, int n)
+{
+	float cal;
+	for(i=0;i<n;i++){
+		fflush(stdin);
+		scanf("%s",(pa+i)->nombre);
+		scanf("%f",&cal);
+		(pa+i)->calificacion =cal;
+	}
+}
+void printArray(Profesor *pa , int n){
+
+	for(i=0;i<n;i++){
+		printf("%s %0.1f \n",(pa+i)->nombre,(pa+i)->calificacion);
+	}
+}
+
+void mergeArrays(Profesor *pa1 , int n1, Profesor *pa2, int n2, Profesor *paF, int nF){
+
+	for (i=0;i<nF;i++){
+		if (i<n1){
+			strcpy((paF+i)->nombre,(pa1+i)->nombre);
+			(paF+i)->calificacion=(pa1+i)->calificacion;
+		}
+		else{
+			strcpy((paF+i)->nombre,(pa2+i-n1)->nombre);
+			(paF+i)->calificacion=(pa2+i-n1)->calificacion;
+		}
+	}
+
+}
+
+void sortArray(Profesor *paF, int nF){
+
+	Profesor arrC[40];
+	Profesor ordenados[40];
+	char new[15]="\0";
+	char h[15],h1[15];
+	int j,o=0, k;
+	float x=1,y=0;
+
+	for (i=0;i<nF;i++){
+		x=1;
+		if (strcmp((paF+i)->nombre, new)!=0){
+			strcpy(arrC[o].nombre,(paF+i)->nombre);
+			y=(paF+i)->calificacion;
+			//			printf("i= %d \n",i);
+			//			printf("y= %f \n",y);
+			//arrC[o].calificacion= averageArray(y,x);
+			o++;
+
+			for(j=1;j<(nF-i);j++){
+
+				k=j+i;
+				strcpy(h,((paF+i)->nombre));
+				strcpy(h1,((paF+k)->nombre));
+				//						printf("(paF+%d)->nombre =%s\n",i,h);
+				//						printf("(paF+%d)->nombre =%s\n",k,h1);
+				//						printf("***\n");
+
+				if (strcmp(h, h1)==0){
+					//printf("iguales\n");
+					x++;
+					y=y+((paF+k)->calificacion);
+					//printf("y= %f \n",y);
+					strcpy(((paF+k)->nombre),new);
+				}
+				//printf("y= %f \n",y);
+				//printf("x= %f \n",x);
+			}
+
+			arrC[o-1].calificacion= averageArray(y,x);
+		}
+	}
+	//printArray(arrC,o);
+	//printArray(paF,nF);
+	//Profesor *paC=arrC;
+
+	for (i=0; i<o; i++ )
+	{
+		ordenados[i].calificacion=arrC[i].calificacion;
+		strcpy(ordenados[i].nombre,arrC[i].nombre);
+	}
+
+	for (i=0; i<o; i++ )
+	{
+		for (j=0; j<o; j++ )
+		{
+			if (arrC[i].calificacion>ordenados[j].calificacion)
+			{
+				ordenados[i].calificacion=arrC[j].calificacion;
+				strcpy(ordenados[i].nombre,arrC[j].nombre);
+
+
+
+				ordenados[j].calificacion=arrC[i].calificacion;
+				strcpy(ordenados[j].nombre,arrC[i].nombre);
+
+
+
+				arrC[i].calificacion=ordenados[i].calificacion;
+				strcpy(arrC[i].nombre,ordenados[i].nombre);
+
+
+				arrC[j].calificacion=ordenados[j].calificacion;
+				strcpy(arrC[j].nombre,ordenados[j].nombre);
+			}
+		}
+	}
+	printArray(ordenados,o);
+}
+
+
+float averageArray(float y, float x){
+	float a;
+	a=y/x;
+	return a;
+}
+
